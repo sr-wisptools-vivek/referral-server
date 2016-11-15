@@ -7,8 +7,14 @@ if (Meteor.isServer) {
     function (job, cb) {
       try {
         console.log('Checking: ' + job.data.userId);
-
-        //job.done("Done");
+        var user = client.call('mdReferAFriendGetUserById', job.data.userId);
+        if (user && user.checkParentReferral===false) {
+          var parentReferralId = user.parentReferralId;
+          if (parentReferralId) {
+            client.call('mdReferAFriendAppendReferral', parentReferralId, job.data.userId);
+          }
+          job.done("Done");
+        }
         cb();
       }
       catch (err) {
